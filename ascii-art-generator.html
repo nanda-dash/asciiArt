@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASCII Art Generator for C Code Comments</title>
+    <style>
+        :root {
+            --background-color-light: #f0f0f0;
+            --text-color-light: #333;
+            --background-color-dark: #333;
+            --text-color-dark: #f0f0f0;
+            --button-background-light: #4CAF50;
+            --button-background-dark: #45a049;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--background-color-light);
+            color: var(--text-color-light);
+        }
+        body.dark-mode {
+            background-color: var(--background-color-dark);
+            color: var(--text-color-dark);
+        }
+        h1 {
+            color: inherit;
+        }
+        #input, #output, #specialChar {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        #output {
+            height: 200px;
+            white-space: pre;
+            font-family: monospace;
+            background-color: #fff;
+            border: 1px solid #ccc;
+        }
+        body.dark-mode #output {
+            background-color: #555;
+            border-color: #777;
+        }
+        button {
+            background-color: var(--button-background-light);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: var(--button-background-dark);
+        }
+        .options {
+            margin-bottom: 10px;
+        }
+        #specialCharInput {
+            display: none;
+        }
+        .theme-toggle {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .theme-toggle button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <h1>ASCII Art Generator for C Code Comments</h1>
+    <div class="theme-toggle">
+        <button onclick="toggleTheme()">
+            <span id="theme-icon">🌞</span>
+        </button>
+    </div>
+    <div class="options">
+        <input type="radio" id="useAlphabets" name="charType" value="alphabets" checked>
+        <label for="useAlphabets">Use Alphabets</label>
+        <input type="radio" id="useSpecialChar" name="charType" value="special">
+        <label for="useSpecialChar">Use Special Character</label>
+    </div>
+    <div id="specialCharInput">
+        <input type="text" id="specialChar" placeholder="Enter a special character" maxlength="1">
+    </div>
+    <input type="text" id="input" placeholder="Enter your text here">
+    <button onclick="generateAsciiArt()">Generate ASCII Art</button>
+    <pre id="output"></pre>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('theme-icon');
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                themeIcon.textContent = '🌜';
+            } else {
+                themeIcon.textContent = '🌞';
+            }
+        }
+
+        const asciiPatterns = {
+            A: [
+                "    A    ",
+                "   A A   ",
+                "  A   A  ",
+                " AAAAAAA ",
+                "A       A",
+                "A       A",
+                "A       A"
+            ],
+            B: [
+                "BBBBBB   ",
+                "B     B  ",
+                "B     B  ",
+                "BBBBBB   ",
+                "B     B  ",
+                "B     B  ",
+                "BBBBBB   "
+            ],
+            C: [
+                "  CCCCC  ",
+                " C     C ",
+                "C        ",
+                "C        ",
+                "C        ",
+                " C     C ",
+                "  CCCCC  "
+            ],
+            D: [
+                "DDDDD    ",
+                "D    D   ",
+                "D     D  ",
+                "D     D  ",
+                "D     D  ",
+                "D    D   ",
+                "DDDDD    "
+            ],
+            E: [
+                "EEEEEEEE ",
+                "E        ",
+                "E        ",
+                "EEEEEEE  ",
+                "E        ",
+                "E        ",
+                "EEEEEEEE "
+            ],
+            F: [
+                "FFFFFFFF ",
+                "F        ",
+                "F        ",
+                "FFFFFFF  ",
+                "F        ",
+                "F        ",
+                "F        "
+            ],
+            G: [
+                "  GGGGG  ",
+                " G     G ",
+                "G        ",
+                "G   GGGG ",
+                "G      G ",
+                " G     G ",
+                "  GGGGG  "
+            ],
+            H: [
+                "H      H ",
+                "H      H ",
+                "H      H ",
+                "HHHHHHHH ",
+                "H      H ",
+                "H      H ",
+                "H      H "
+            ],
+            I: [
+                "IIIIIIII ",
+                "   II    ",
+                "   II    ",
+                "   II    ",
+                "   II    ",
+                "   II    ",
+                "IIIIIIII "
+            ],
+            J: [
+                "JJJJJJJJ ",
+                "     JJ  ",
+                "     JJ  ",
+                "     JJ  ",
+                "J    JJ  ",
+                "J    JJ  ",
+                " JJJJJ   "
+            ],
+            K: [
+                "K     K  ",
+                "K    K   ",
+                "K   K    ",
+                "KKK      ",
+                "K    K   ",
+                "K     K  ",
+                "K      K "
+            ],
+            L: [
+                "L        ",
+                "L        ",
+                "L        ",
+                "L        ",
+                "L        ",
+                "L        ",
+                "LLLLLLLL "
+            ],
+            M: [
+                "M       M",
+                "MM     MM",
+                "M M   M M",
+                "M  M M  M",
+                "M   M   M",
+                "M       M",
+                "M       M"
+            ],
+            N: [
+                "N       N",
+                "NN      N",
+                "N N     N",
+                "N  N    N",
+                "N   N   N",
+                "N    N  N",
+                "N     N N"
+            ],
+            O: [
+                "  OOOOO  ",
+                " O     O ",
+                "O       O",
+                "O       O",
+                "O       O",
+                " O     O ",
+                "  OOOOO  "
+            ],
+            P: [
+                "PPPPPPP  ",
+                "P      P ",
+                "P      P ",
+                "PPPPPPP  ",
+                "P        ",
+                "P        ",
+                "P        "
+            ],
+            Q: [
+                "  QQQQQ  ",
+                " Q     Q ",
+                "Q       Q",
+                "Q       Q",
+                "Q     Q Q",
+                " Q     Q ",
+                "  QQQQQ Q"
+            ],
+            R: [
+                "RRRRRRR  ",
+                "R      R ",
+                "R      R ",
+                "RRRRRRR  ",
+                "R   R    ",
+                "R    R   ",
+                "R     R  "
+            ],
+            S: [
+                " SSSSSSS ",
+                "S        ",
+                "S        ",
+                " SSSSSS  ",
+                "       S ",
+                "       S ",
+                "SSSSSSS  "
+            ],
+            T: [
+                "TTTTTTTTT",
+                "   TTT   ",
+                "   TTT   ",
+                "   TTT   ",
+                "   TTT   ",
+                "   TTT   ",
+                "   TTT   "
+            ],
+            U: [
+                "U       U",
+                "U       U",
+                "U       U",
+                "U       U",
+                "U       U",
+                " U     U ",
+                "  UUUUU  "
+            ],
+            V: [
+                "V       V",
+                "V       V",
+                " V     V ",
+                " V     V ",
+                "  V   V  ",
+                "   V V   ",
+                "    V    "
+            ],
+            W: [
+                "W       W",
+                "W       W",
+                "W   W   W",
+                "W  W W  W",
+                "W W   W W",
+                "WW     WW",
+                "W       W"
+            ],
+            X: [
+                "X       X",
+                " X     X ",
+                "  X   X  ",
+                "   X X   ",
+                "  X   X  ",
+                " X     X ",
+                "X       X"
+            ],
+            Y: [
+                "Y       Y",
+                " Y     Y ",
+                "  Y   Y  ",
+                "   Y Y   ",
+                "    Y    ",
+                "    Y    ",
+                "    Y    "
+            ],
+            Z: [
+                "ZZZZZZZZZ",
+                "      ZZ ",
+                "     ZZ  ",
+                "    ZZ   ",
+                "   ZZ    ",
+                "  ZZ     ",
+                "ZZZZZZZZZ"
+            ]
+        };
+
+        document.querySelectorAll('input[name="charType"]').forEach((elem) => {
+            elem.addEventListener("change", function(event) {
+                var specialCharInput = document.getElementById("specialCharInput");
+                specialCharInput.style.display = event.target.value === "special" ? "block" : "none";
+            });
+        });
+
+        function generateAsciiArt() {
+            const input = document.getElementById('input').value.toUpperCase();
+            const output = document.getElementById('output');
+            const useSpecialChar = document.getElementById('useSpecialChar').checked;
+            let specialChar = document.getElementById('specialChar').value;
+            let result = '';
+
+            if (useSpecialChar && specialChar.length === 0) {
+                alert("Please enter a special character.");
+                return;
+            }
+
+            for (let i = 0; i < 7; i++) {
+                for (let char of input) {
+                    if (useSpecialChar) {
+                        result += asciiPatterns[char] ? asciiPatterns[char][i].replace(/[A-Z]/g, specialChar) : '         ';
+                    } else {
+                        result += asciiPatterns[char] ? asciiPatterns[char][i] : '         ';
+                    }
+                }
+                result += '\n';
+            }
+
+            output.textContent = result;
+        }
+    </script>
+</body>
+</html>
